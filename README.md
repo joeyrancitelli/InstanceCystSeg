@@ -8,7 +8,7 @@ Also included is a python-based image viewer and editing toolkit which provides 
 References
 -----------
 
-Gregory AV, Anaam DA, Vercnocke AJ, Edwards ME, Torres VE, Harris PC, Erickson BJ, Kline TL. Semantic instance segmentation of kidney cysts in MR images: A fully automated 3D approach developed through active learning. (under review). 
+Gregory AV, Anaam DA, Vercnocke AJ, Edwards ME, Torres VE, Harris PC, Erickson BJ, Kline TL. Semantic instance segmentation of kidney cysts in MR images: A fully automated 3D approach developed through active learning. J Digit Im. 34(4):773-787, 2021.
 
 
 Maintainers
