@@ -9,6 +9,7 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as K
 from sklearn.model_selection import train_test_split
 import numpy as np
+import matplotlib.pyplot as plt
 import cv2
 import os
 import nibabel as nib
@@ -16,13 +17,12 @@ from tqdm import *
 import copy
 from Edge_Core_Labels_WatershedAndCC import instance_seg
 
+from _3ch_instanceCystSeg_train_unet_t001 import get_unet
 #Add the .hdf5 names
-from _3ch_instanceCystSeg_train_unet import get_unet
-modelname1 = ''
+modelname1 = '' # 'instanceCystSeg_modelWeights_3ch_t001'
 modelname2 = ''
 modelname3 = ''
-FOLDER = '' # Dataset folder
-oriprefix = '' # MR image extension
+
 
 #--------------------------
 # END USER INPUT
@@ -35,25 +35,25 @@ img_cols = 512
 
 smooth = 1.
 
-input_folder=FOLDER
-output_folder = FOLDER
+input_folder='FOLDER'
+output_folder = 'FOLDER'
 image_folder = ''
 seg_folder = ''
-segout_folder = FOLDER
+segout_folder = 'FOLDER'      		# specify prediction output folder
 
-oriprefix = '' # MR indetifier + extension
-kidneyprefix = '' # Kidney segmentation indetifier + extension
-segprefix = '_' + modelname1 + '' # add extension
-strremove = -len(oriprefix)
+oriprefix = '' 						# MR indetifier + extension
+kidneyprefix = '' 					# Kidney segmentation indetifier + extension
+segprefix = '_' + modelname1 + ''	# add extension
+strremove = -len(kidneyprefix)
 Scan = 512
 count = 0
 
 try:
-	subdir, dirs, files = os.walk(input_folder).__next__()
-	files = [k for k in files if oriprefix in k]
+	subdir, dirs, files = os.walk(input_folder).next()
+	files = [k for k in files if kidneyprefix in k]
 except:
 	subdir, dirs, files = os.walk(input_folder).__next__()
-	files = [k for k in files if oriprefix in k]
+	files = [k for k in files if kidneyprefix in k]
 
 counter = 0
 
@@ -64,13 +64,14 @@ model2.load_weights(modelname2+'.hdf5')
 model3 = get_unet()
 model3.load_weights(modelname3+'.hdf5') 
 				
-for filename in tqdm(files):
+for filename in tqdm(files[:]):  
 	count+=1
-	if oriprefix in filename:     
-		if 'Seg' not in filename:
-			if 'unet4' not in filename: 
-				imgloaded = nib.load(input_folder+'/'+image_folder+'/'+filename)
+	if kidneyprefix in filename:     
+		if modelname1 not in filename:
+			if 'Seg' not in filename: 
+				imgloaded = nib.load(input_folder+'/'+image_folder+'/'+filename[:strremove]+oriprefix)
 				data = imgloaded.get_data()
+				print(filename)
 				print(type(data))
 				data=np.asarray(data).astype(np.float32)
 				data = data/np.percentile(data,99) * 255
@@ -78,6 +79,8 @@ for filename in tqdm(files):
 
 				segimg = nib.load(input_folder+'/'+image_folder+'/'+filename[:strremove]+kidneyprefix)
 				segdata = segimg.get_data()
+				# binarize kidney labels
+				segdata[segdata>2]=0
 				segdata[segdata>1]=1
 				segdata = np.asarray(segdata).astype(np.float32)
 
@@ -98,11 +101,19 @@ for filename in tqdm(files):
 					seg_stack_r[:,:,io] = dataslc
 
 				img_stack = np.rot90(img_stack_r, 3, axes=(0,2))
+				print(np.shape(img_stack))
 				seg_stack = np.rot90(seg_stack_r, 3, axes=(0,2))
+
+				# upsample image stack to 512x512
+				img_stack_512 = np.zeros(shape=[np.shape(img_stack)[2],Scan,Scan],dtype='float32') 
+				for io in range(0,np.shape(img_stack)[2]):
+					img_stack_512[io,:,:] = cv2.resize(img_stack[:,:,io], (Scan,Scan), interpolation=cv2.INTER_CUBIC)
+				print(np.shape(img_stack_512))
+
 
 				# x,y - interpolation
 
-				dataslice = np.zeros(shape=[np.shape(img_stack)[2],4,Scan,Scan],dtype='float32') 
+				dataslice = np.zeros(shape=[np.shape(img_stack)[2],4,Scan,Scan],dtype='float32') #np.zeros(shape=[np.shape(data)[2],2,Scan,Scan],dtype='float32')
 
 				for io in range(0,np.shape(img_stack)[2]):
 					if io==0:
@@ -132,11 +143,10 @@ for filename in tqdm(files):
 				print('Predicting masks on test data...')
 				print(filename)
 				print('-'*30)
-
 				print(np.min(img),np.max(img))
 				print(np.mean(img),np.std(img))
 
-				y_proba1 = model1.predict(img)
+				y_proba1 = model1.predict(img, batch_size=1)
 				print(np.shape(y_proba1))
 				print(np.sum(y_proba1[:,0,:,:]))
 				print(np.sum(y_proba1[:,1,:,:]))
@@ -147,7 +157,7 @@ for filename in tqdm(files):
 				core1 = copy.deepcopy(imgs_mask_test1)
 				core1[core1>1] = 0
 
-				y_proba2 = model2.predict(img)
+				y_proba2 = model2.predict(img, batch_size=1)
 				print(np.shape(y_proba2))
 				print(np.sum(y_proba2[:,0,:,:]))
 				print(np.sum(y_proba2[:,1,:,:]))
@@ -158,7 +168,7 @@ for filename in tqdm(files):
 				core2 = copy.deepcopy(imgs_mask_test2)
 				core2[core2>1] = 0
 
-				y_proba3 = model3.predict(img)
+				y_proba3 = model3.predict(img, batch_size=1)
 				print(np.shape(y_proba3))
 				print(np.sum(y_proba3[:,0,:,:]))
 				print(np.sum(y_proba3[:,1,:,:]))
@@ -168,6 +178,8 @@ for filename in tqdm(files):
 				edge3[edge3<2] = 0
 				core3 = copy.deepcopy(imgs_mask_test3)
 				core3[core3>1] = 0
+
+				
 
 				imgs_mask_test_edge = edge1 + edge2 + edge3
 				print('here')
@@ -180,6 +192,7 @@ for filename in tqdm(files):
 				print(np.min(imgs_mask_test_core),np.max(imgs_mask_test_core))
 				imgs_mask_test_core[imgs_mask_test_core<2] = 0
 				imgs_mask_test_core[imgs_mask_test_core>0] = 1
+
 
 				imgs_mask_test = imgs_mask_test_edge + imgs_mask_test_core
 				imgs_mask_test[imgs_mask_test>2] = 2
@@ -195,31 +208,36 @@ for filename in tqdm(files):
 
 				affine = imgloaded.get_affine()
 				info = copy.deepcopy(affine)
+				print(info)
 				factor1 = Scan/data.shape[1]
-				info[0,0] = info[0,0]/factor1
-				info[2,1] = info[2,1]/factor1
+
 				info[1,2] = info[1,2]/factor
 
-				img_EC = np.zeros(shape = [Scan,Scan,segdata.shape[2]*factor])
+
+				img_EC = np.zeros(shape = [data.shape[0],data.shape[1],segdata.shape[2]*factor])
 				for io in range(0,np.shape(img_stack)[2]):
-					img_EC[:,:,io] = cv2.resize(imgs_mask_test[io,:,:], (Scan,Scan), interpolation=cv2.INTER_NEAREST)
+					img_EC[:,:,io] = cv2.resize(imgs_mask_test[io,:,:], (data.shape[1],data.shape[0]), interpolation=cv2.INTER_NEAREST)
 
 				img_EC = img_EC.astype(np.uint8)
+				# Print upsampled edge-core map
 				nifti = nib.Nifti1Image(img_EC, info)
 				nifti.to_filename(input_folder+'/'+image_folder+'/'+filename[:strremove]+segprefix)
 
-				imgs_mask_test_labels = instance_seg(imgs_mask_test)
+				info[0,0] = info[0,0]/factor1
+				info[2,1] = info[2,1]/factor1
 
-				img_out1 = np.zeros(shape = [Scn,Scn,segdata.shape[2]*factor])
+				imgs_mask_test_labels = instance_seg(img_stack_512, imgs_mask_test, info)
+
+				img_out1 = np.zeros(shape = [data.shape[0],data.shape[1],segdata.shape[2]*factor])
 				for io in range(0,np.shape(img_stack)[2]):
 					img_out1[:,:,io] = cv2.resize(imgs_mask_test_labels[io,:,:], (np.shape(data)[1],np.shape(data)[0]), interpolation=cv2.INTER_NEAREST)
 
+
 				segdataout_r = np.rot90(img_out1, axes=(0,2))
-				img_out = np.zeros(shape=[segdata.shape[2],Scn,Scn])
-				dataslc = np.zeros(shape=[segdata.shape[2],Scn])
+				img_out = np.zeros(shape=[segdata.shape[2],data.shape[1],data.shape[0]])
+				dataslc = np.zeros(shape=[segdata.shape[2],data.shape[1]])
 				for io in range(0,np.shape(segdataout_r)[2]):
-					dataslc = cv2.resize(segdataout_r[:,:,io], (Scn, segdata.shape[2]), interpolation=cv2.INTER_CUBIC)
-					img_out[:,:,io] = dataslc
+					img_out[:,:,io] = cv2.resize(segdataout_r[:,:,io], (data.shape[1], segdata.shape[2]), interpolation=cv2.INTER_NEAREST)
 				img_out = np.rot90(img_out, 3, axes=(0,2))
 
 				print('here')
@@ -230,6 +248,4 @@ for filename in tqdm(files):
 				affine = imgloaded.get_affine()
 				nifti = nib.Nifti1Image(img_out, affine)
 				nifti.to_filename(input_folder+'/'+image_folder+'/'+filename[:strremove]+'_CystInstSeg.nii.gz')
-					
-					
 					
