@@ -11,17 +11,25 @@ from collections import Counter
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
 
-def instance_seg(semantic_seg):
+def instance_seg(image_data, semantic_seg, affine):
+
+    cystsz = 20 # approx. cyst diameter in mm   
+    x = int(np.round(cystsz/np.abs(affine[0,0])))
+    y = int(np.round(cystsz/np.abs(affine[2,1])))
+    z = int(np.round(cystsz/np.abs(affine[1,2])))
 
     cystdata = copy.deepcopy(semantic_seg)    
     cystdata[cystdata>1]=0
-    
-    # Watershed
-    distance = ndimage.distance_transform_edt(cystdata)
-    local_maxi = peak_local_max(distance, indices=False, footprint=np.ones((17, 17, 7)), labels=cystdata)
-    markers = measure.label(local_maxi)
+
+    # Watershed segmentation to separate connected cysts
+    distanceI = image_data #image-based
+    distanceS = ndimage.distance_transform_edt(cystdata) #shape-based
+    distance = (distanceI/np.max(distanceI)) * (distanceS/np.max(distanceS)) #weighting distance with both
+    coords = peak_local_max(distance, footprint=np.ones((z, x, y)), labels=cystdata) 
+    mask = np.zeros(distance.shape, dtype=bool)
+    mask[tuple(coords.T)] = True
+    markers, _ = ndimage.label(mask)
     labels_ws = watershed(-distance, markers, mask=cystdata)
-    lastLabel = np.max(labels_ws)
 
     #ConnectedComponents
     ws_copy = copy.deepcopy(labels_ws)
@@ -53,6 +61,6 @@ def instance_seg(semantic_seg):
     cystNum2 = cystNum2[cystNum2!=0]
     print('Cyst count:')
     print(np.size(cystNum2))
-    
+   
     f_labels = f_labels.astype(np.int32)
     return f_labels
