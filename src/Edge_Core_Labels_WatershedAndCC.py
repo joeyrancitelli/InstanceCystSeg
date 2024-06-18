@@ -8,7 +8,7 @@ from skimage import measure
 from skimage import morphology
 from scipy import ndimage
 from collections import Counter
-from skimage.morphology import watershed
+from skimage.segmentation import watershed
 from skimage.feature import peak_local_max
 
 def instance_seg(image_data, semantic_seg, affine):

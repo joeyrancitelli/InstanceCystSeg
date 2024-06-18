@@ -3,7 +3,7 @@ from __future__ import print_function
 import cv2
 import numpy as np
 from keras.models import Model
-from keras.layers import Input, merge, Convolution2D, MaxPooling2D, UpSampling2D
+from keras.layers import Input, Convolution2D, MaxPooling2D, UpSampling2D
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as K
@@ -17,34 +17,35 @@ from tqdm import *
 import copy
 from Edge_Core_Labels_WatershedAndCC import instance_seg
 
-from _3ch_instanceCystSeg_train_unet_t001 import get_unet
+from _3ch_instanceCystSeg_train_unet import get_unet
 #Add the .hdf5 names
-modelname1 = '' # 'instanceCystSeg_modelWeights_3ch_t001'
-modelname2 = ''
-modelname3 = ''
+modelname1 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001' # 'instanceCystSeg_modelWeights_3ch_t001'
+modelname2 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001'
+modelname3 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001'
 
 
 #--------------------------
 # END USER INPUT
 #--------------------------
 
-K.set_image_data_format('channels_first')
+K.set_image_data_format('channels_first') 
 
 img_rows = 512
 img_cols = 512
 
 smooth = 1.
 
-input_folder='FOLDER'
-output_folder = 'FOLDER'
-image_folder = ''
-seg_folder = ''
-segout_folder = 'FOLDER'      		# specify prediction output folder
+input_folder='input_folder'
+output_folder = 'output_folder'
+image_folder = 'image_folder'
+seg_folder = 'seg_folder'
+segout_folder = 'segout_folder'      		# specify prediction output folder
 
-oriprefix = '' 						# MR indetifier + extension
-kidneyprefix = '' 					# Kidney segmentation indetifier + extension
-segprefix = '_' + modelname1 + ''	# add extension
+oriprefix = 'dcm.nii.gz' 						# MR indetifier + extension
+kidneyprefix = 'seg.nii.gz' 					# Kidney segmentation indetifier + extension
+segprefix = '_' + modelname1 + '.nii.gz'	# add extension
 strremove = -len(kidneyprefix)
+full_image_path = os.path.join(input_folder, image_folder)
 Scan = 512
 count = 0
 
