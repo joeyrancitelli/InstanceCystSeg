@@ -23,7 +23,6 @@ modelname1 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001' # 'instanceCy
 modelname2 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001'
 modelname3 = 'model_weights/instanceCystSeg_modelWeights_3ch_t001'
 
-makeError
 #--------------------------
 # END USER INPUT
 #--------------------------
