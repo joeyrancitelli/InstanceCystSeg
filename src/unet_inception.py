@@ -20,7 +20,7 @@ def _shortcut(_input, residual):
                                  kernel_initializer="he_normal", padding="valid")(_input)
 
     return add([shortcut, residual]) 
-
+test
 
 def inception_block(inputs, depth, batch_mode=0, splitted=False, activation='relu'):
     assert depth % 16 == 0
