@@ -72,7 +72,7 @@ def get_unet():
 
     model = Model(inputs=inputs, outputs=conv12)
 
-    model.compile(loss=jaccard_distance_loss,optimizer=Adam(lr=1.E-3,decay=1.E-5),metrics=[jaccard_distance_loss])
+    model.compile(loss=jaccard_distance_loss,optimizer=Adam(learning_rate=1.E-3,decay=1.E-5),metrics=[jaccard_distance_loss])
 
     return model
 
