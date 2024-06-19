@@ -67,7 +67,7 @@ def rblock(inputs, num, depth, scale=0.1):
 
 def NConvolution2D(nb_filter, nb_row, nb_col, padding='same', subsample=(1, 1)):
     def f(_input):
-        conv = Conv2D(nb_filter=nb_filter, nb_row=nb_row, nb_col=nb_col, subsample=subsample,
+        conv = Conv2D(filters=nb_filter, kernel_size=(nb_row, nb_col), strides=subsample,
                               padding=padding)(_input)
         norm = BatchNormalization(axis=1)(conv)
         return ELU()(norm)
