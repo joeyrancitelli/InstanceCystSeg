@@ -34,9 +34,8 @@ img_cols = 512
 
 smooth = 1.
 
-colab_path = '/content/drive/My Drive/InstanceCystSeg-master/'
-input_folder='input_folder'
-output_folder = 'output_folder'
+input_folder='/content/drive/My Drive/InstanceCystSeg-master/input_folder'
+output_folder = '/content/drive/My Drive/InstanceCystSeg-master/output_folder'
 image_folder = 'image_folder'
 seg_folder = 'seg_folder'
 segout_folder = 'segout_folder'      		# specify prediction output folder
@@ -45,8 +44,8 @@ oriprefix = 'dcm.nii.gz' 						# MR indetifier + extension
 kidneyprefix = 'seg.nii.gz' 					# Kidney segmentation indetifier + extension
 segprefix = '_' + modelname1 + '.nii.gz'	# add extension
 strremove = -len(kidneyprefix)
-full_image_path = os.path.join(colab_path, input_folder, image_folder)
-print(os.listdir(full_image_path))
+full_image_path = os.path.join(input_folder, image_folder)
+
 Scan = 512
 count = 0
 
