@@ -8,14 +8,14 @@ from metric import dice_coef, dice_coef_loss
 IMG_ROWS, IMG_COLS = 512,512
 
 def _shortcut(_input, residual):
-    stride_width = _input._keras_shape[2] / residual._keras_shape[2]
-    stride_height = _input._keras_shape[3] / residual._keras_shape[3]
-    equal_channels = residual._keras_shape[1] == _input._keras_shape[1]
+    stride_width = _input.shape[2] / residual.shape[2]
+    stride_height = _input.shape[3] / residual.shape[3]
+    equal_channels = residual.shape[1] == _input.shape[1]
 
     shortcut = _input
 
     if stride_width > 1 or stride_height > 1 or not equal_channels:
-        shortcut = Conv2D(nb_filter=residual._keras_shape[1], nb_row=1, nb_col=1,
+        shortcut = Conv2D(nb_filter=residual.shape[1], nb_row=1, nb_col=1,
                                  subsample=(stride_width, stride_height),
                                  kernel_initializer="he_normal", padding="valid")(_input)
 
