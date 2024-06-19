@@ -30,6 +30,7 @@ def instance_seg(image_data, semantic_seg, affine):
     mask[tuple(coords.T)] = True
     markers, _ = ndimage.label(mask)
     labels_ws = watershed(-distance, markers, mask=cystdata)
+    lastLabel = np.max(labels_ws)
 
     #ConnectedComponents
     ws_copy = copy.deepcopy(labels_ws)
