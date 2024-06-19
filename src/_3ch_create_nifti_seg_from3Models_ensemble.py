@@ -207,7 +207,7 @@ for filename in tqdm(files[:]):
 				
 				print(np.shape(imgs_mask_test))
 
-				affine = imgloaded.affine()
+				affine = imgloaded.affine
 				info = copy.deepcopy(affine)
 				print(info)
 				factor1 = Scan/data.shape[1]
