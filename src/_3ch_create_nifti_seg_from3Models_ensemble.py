@@ -45,7 +45,7 @@ kidneyprefix = 'seg.nii.gz' 					# Kidney segmentation indetifier + extension
 segprefix = '_' + modelname1 + '.nii.gz'	# add extension
 strremove = -len(kidneyprefix)
 full_image_path = os.path.join(input_folder, image_folder)
-
+print(os.listdir(full_image_path))
 Scan = 512
 count = 0
 
