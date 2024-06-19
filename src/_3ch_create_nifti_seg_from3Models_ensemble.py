@@ -248,7 +248,7 @@ for filename in tqdm(files[:]):
 				print(np.shape(img_out))
 				print(np.min(img_out),np.max(img_out))
 				img_out = img_out.astype(np.int32)
-				affine = imgloaded.get_affine()
+				affine = imgloaded.affine
 				nifti = nib.Nifti1Image(img_out, affine)
 				nifti.to_filename(input_folder+'/'+image_folder+'/'+filename[:strremove]+'_CystInstSeg.nii.gz')
 					
