@@ -49,11 +49,11 @@ Scan = 512
 count = 0
 
 try:
-	subdir, dirs, files = os.walk(input_folder).next()
-	files = [k for k in files if kidneyprefix in k]
-except:
-	subdir, dirs, files = os.walk(input_folder).__next__()
-	files = [k for k in files if kidneyprefix in k]
+    subdir, dirs, files = next(os.walk(full_image_path))
+except StopIteration:
+    files = []  # This handles the case where the directory does not exist or is empty.
+
+files = [k for k in files if kidneyprefix in k]
 
 counter = 0
 
