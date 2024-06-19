@@ -71,7 +71,7 @@ for filename in tqdm(files[:]):
 		if modelname1 not in filename:
 			if 'Seg' not in filename: 
 				imgloaded = nib.load(input_folder+'/'+image_folder+'/'+filename[:strremove]+oriprefix)
-				data = imgloaded.get_data()
+				data = imgloaded.get_fdata()
 				print(filename)
 				print(type(data))
 				data=np.asarray(data).astype(np.float32)
@@ -79,7 +79,7 @@ for filename in tqdm(files[:]):
 				data[data>255] = 255
 
 				segimg = nib.load(input_folder+'/'+image_folder+'/'+filename[:strremove]+kidneyprefix)
-				segdata = segimg.get_data()
+				segdata = segimg.get_fdata()
 				# binarize kidney labels
 				segdata[segdata>2]=0
 				segdata[segdata>1]=1
