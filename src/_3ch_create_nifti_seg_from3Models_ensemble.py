@@ -34,6 +34,7 @@ img_cols = 512
 
 smooth = 1.
 
+colab_path = '/content/drive/My Drive/InstanceCystSeg-master/'
 input_folder='input_folder'
 output_folder = 'output_folder'
 image_folder = 'image_folder'
@@ -44,7 +45,8 @@ oriprefix = 'dcm.nii.gz' 						# MR indetifier + extension
 kidneyprefix = 'seg.nii.gz' 					# Kidney segmentation indetifier + extension
 segprefix = '_' + modelname1 + '.nii.gz'	# add extension
 strremove = -len(kidneyprefix)
-full_image_path = os.path.join(input_folder, image_folder)
+full_image_path = os.path.join(colab_path, input_folder, image_folder)
+print(full_image_path)
 Scan = 512
 count = 0
 
@@ -54,7 +56,7 @@ try:
 except:
 	subdir, dirs, files = os.walk(input_folder).__next__()
 	files = [k for k in files if kidneyprefix in k]
-print(len(files))
+
 counter = 0
 
 model1 = get_unet()
