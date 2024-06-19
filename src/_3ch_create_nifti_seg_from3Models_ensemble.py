@@ -242,6 +242,7 @@ for filename in tqdm(files[:]):
 				for io in range(0,np.shape(segdataout_r)[2]):
 					img_out[:,:,io] = cv2.resize(segdataout_r[:,:,io], (data.shape[1], segdata.shape[2]), interpolation=cv2.INTER_NEAREST)
 				img_out = np.rot90(img_out, 3, axes=(0,2))
+				img_out[img_out != 0] = 1
 
 				print('here')
 				print(np.min(img_out),np.max(img_out))
