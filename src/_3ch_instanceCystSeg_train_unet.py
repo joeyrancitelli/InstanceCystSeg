@@ -70,7 +70,7 @@ def get_unet():
     
     conv12 = Conv2D(3, (1, 1), activation='sigmoid')(conv9)
 
-    model = Model(input=inputs, output=conv12)
+    model = Model(inputs=inputs, outputs=conv12)
 
     model.compile(loss=jaccard_distance_loss,optimizer=Adam(lr=1.E-3,decay=1.E-5),metrics=[jaccard_distance_loss])
 
