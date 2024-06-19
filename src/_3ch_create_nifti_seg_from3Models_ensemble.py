@@ -50,10 +50,10 @@ Scan = 512
 count = 0
 
 try:
-	subdir, dirs, files = os.walk(input_folder).next()
+	subdir, dirs, files = os.walk(full_image_path).next()
 	files = [k for k in files if kidneyprefix in k]
 except:
-	subdir, dirs, files = os.walk(input_folder).__next__()
+	subdir, dirs, files = os.walk(full_image_path).__next__()
 	files = [k for k in files if kidneyprefix in k]
 
 counter = 0
