@@ -54,7 +54,7 @@ try:
 except:
 	subdir, dirs, files = os.walk(input_folder).__next__()
 	files = [k for k in files if kidneyprefix in k]
-
+print(len(files))
 counter = 0
 
 model1 = get_unet()
