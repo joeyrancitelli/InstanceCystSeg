@@ -222,6 +222,7 @@ for filename in tqdm(files[:]):
 				img_EC = img_EC.astype(np.uint8)
 				# Print upsampled edge-core map
 				nifti = nib.Nifti1Image(img_EC, info)
+				os.makedirs(os.path.join(input_folder, image_folder, filename[:strremove]))
 				nifti.to_filename(input_folder+'/'+image_folder+'/'+filename[:strremove]+segprefix)
 
 				info[0,0] = info[0,0]/factor1
