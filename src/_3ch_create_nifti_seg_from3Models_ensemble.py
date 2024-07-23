@@ -40,8 +40,8 @@ image_folder = 'image_folder'
 seg_folder = 'seg_folder'
 segout_folder = 'segout_folder'      		# specify prediction output folder
 
-oriprefix = 'dcm.nii.gz' 						# MR indetifier + extension
-kidneyprefix = 'seg.nii.gz' 					# Kidney segmentation indetifier + extension
+oriprefix = 'DCM.nii.gz' 						# MR indetifier + extension
+kidneyprefix = 'KC.nii.gz' 					# Kidney segmentation indetifier + extension
 segprefix = '_' + modelname1 + '.nii.gz'	# add extension
 strremove = -len(kidneyprefix)
 full_image_path = os.path.join(input_folder, image_folder)
